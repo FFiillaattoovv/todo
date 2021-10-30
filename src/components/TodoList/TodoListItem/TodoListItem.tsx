@@ -1,31 +1,63 @@
-import {CSSProperties, FC} from "react";
+import {Component} from "react";
 import "./TodoListItem.css"
 
-export const TodoListItem: FC<TodoListItemPropsType> = ({label, important = false}) => {
-    const style: CSSProperties = {
-        color: important ? 'steelblue' : 'black',
-        fontWeight: important ? 'bold' : 'normal'
+export class TodoListItem extends Component<TodoListItemPropsType, TodoListItemStateType> {
+    static defaultProps = {important: false}
+
+    state = {
+        done: false,
+        important: false,
     }
 
-    return (
-        <span className="todo-list-item">
-            <span style={style} className="todo-list-item-label">
+    onLabelClick = () => {
+        this.setState(({done}) => {
+            return {
+                done: !done
+            }
+        })
+    }
+
+    onMarkImportant = () => {
+        this.setState(({important}) => {
+            return {
+                important: !important
+            }
+        })
+    }
+
+    render() {
+        const {label} = this.props;
+        const {done, important} = this.state;
+        let classNames = "todo-list-item"
+
+        if (done) classNames += " done"
+        if (important) classNames += " important"
+
+        return (
+            <span className={classNames}>
+            <span className="todo-list-item-label" onClick={this.onLabelClick}>
                 {label}
             </span>
 
-            <button type="button" className="btn btn-outline-success btn-sm float-right">
+            <button type="button" className="btn btn-outline-success btn-sm float-right" onClick={this.onMarkImportant}>
                 <i className="fa fa-exclamation"/>
             </button>
 
-            <button type="button" className="btn btn-outline-danger btn-sm float-right">
+            <button type="button" className="btn btn-outline-danger btn-sm float-right" onClick={this.props.onDeleted}>
                 <i className="fa fa-trash-o"/>
             </button>
         </span>
-    )
+        )
+    }
 }
 
 // types
 type TodoListItemPropsType = {
     label: string
+    important: boolean
+    onDeleted: () => void
+}
+type TodoListItemStateType = {
+    done: boolean
     important: boolean
 }
