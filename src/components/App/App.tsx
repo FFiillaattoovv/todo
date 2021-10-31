@@ -4,15 +4,27 @@ import {ItemStatusFilter} from "../ItemStatusFilter/ItemStatusFilter";
 import {TodoList} from "../TodoList/TodoList";
 import "./App.css"
 import {Component} from "react";
+import {ItemAddForm} from "../ItemAddForm/ItemAddForm";
 
 export class App extends Component<{}, AppStateType> {
 
+    maxId = 100
+
     state = {
         todos: [
-            {id: 1, label: 'Learn Redux', important: true},
-            {id: 2, label: 'Listen to the podcast', important: false},
-            {id: 3, label: 'Drink Coffee', important: false},
+            this.createTodoItem('Learn Redux'),
+            this.createTodoItem('Listen to the podcast'),
+            this.createTodoItem('Take a walk'),
         ]
+    }
+
+    createTodoItem(label: string) {
+        return {
+            id: this.maxId++,
+            label,
+            done: false,
+            important: false
+        }
     }
 
     deleteItem = (id: number) => {
@@ -29,16 +41,62 @@ export class App extends Component<{}, AppStateType> {
         })
     }
 
+    addItem = () => {
+        const text = 'Learn something'
+        const newItem = this.createTodoItem(text)
+
+        this.setState(({todos}) => {
+            const newArray = [
+                ...todos, newItem
+            ]
+
+            return {
+                todos: newArray
+            }
+        })
+    }
+
+    toggleProperty(arr: TodosType, id: number, propName: keyof TodoType) {
+        const index = arr.findIndex(todo => todo.id === id)
+        const oldTodo = arr[index]
+        const newTodo = {
+            ...oldTodo,
+            [propName]: !oldTodo?.[propName]
+        }
+        const newArray = [
+            ...arr.slice(0, index),
+            newTodo,
+            ...arr.slice(index + 1)
+        ]
+
+        return {
+            todos: newArray
+        }
+    }
+
+    onToggleImportant = (id: number) => {
+        this.setState(({todos}) => this.toggleProperty(todos, id, "important"))
+    }
+
+    onToggleDone = (id: number) => {
+        this.setState(({todos}) => this.toggleProperty(todos, id, "done"))
+    }
+
     render() {
+        const {todos} = this.state
+        const doneCount = todos.filter(todo => todo.done).length
+        const todoCount = todos.length - doneCount
 
         return (
             <div className="todo-app">
-                <AppHeader done={1} toDo={2}/>
+                <AppHeader toDo={todoCount} done={doneCount}/>
                 <div className="top-panel d-flex">
                     <SearchPanel/>
                     <ItemStatusFilter/>
                 </div>
-                <TodoList todos={this.state.todos} onDeleted={this.deleteItem}/>
+                <TodoList todos={todos} onDeleted={this.deleteItem} onToggleDone={this.onToggleDone}
+                          onToggleImportant={this.onToggleImportant}/>
+                <ItemAddForm onItemAdded={this.addItem}/>
             </div>
         )
     }
@@ -52,7 +110,9 @@ type AppStateType = {
 export type TodoType = {
     id: number
     label: string
+    done: boolean
     important: boolean
 }
 export type TodosType = Array<TodoType>
+
 

@@ -1,63 +1,42 @@
-import {Component} from "react";
 import "./TodoListItem.css"
+import {FC} from "react";
 
-export class TodoListItem extends Component<TodoListItemPropsType, TodoListItemStateType> {
-    static defaultProps = {important: false}
+export const TodoListItem: FC<TodoListItemPropsType> = ({
+                                                            label,
+                                                            done,
+                                                            important,
+                                                            onDeleted,
+                                                            onToggleDone,
+                                                            onToggleImportant
+                                                        }) => {
+    let classNames = "todo-list-item"
 
-    state = {
-        done: false,
-        important: false,
-    }
+    if (done) classNames += " done"
+    if (important) classNames += " important"
 
-    onLabelClick = () => {
-        this.setState(({done}) => {
-            return {
-                done: !done
-            }
-        })
-    }
-
-    onMarkImportant = () => {
-        this.setState(({important}) => {
-            return {
-                important: !important
-            }
-        })
-    }
-
-    render() {
-        const {label} = this.props;
-        const {done, important} = this.state;
-        let classNames = "todo-list-item"
-
-        if (done) classNames += " done"
-        if (important) classNames += " important"
-
-        return (
-            <span className={classNames}>
-            <span className="todo-list-item-label" onClick={this.onLabelClick}>
+    return (
+        <span className={classNames}>
+            <span className="todo-list-item-label" onClick={onToggleDone}>
                 {label}
             </span>
 
-            <button type="button" className="btn btn-outline-success btn-sm float-right" onClick={this.onMarkImportant}>
+            <button type="button" className="btn btn-outline-success btn-sm float-right" onClick={onToggleImportant}>
                 <i className="fa fa-exclamation"/>
             </button>
 
-            <button type="button" className="btn btn-outline-danger btn-sm float-right" onClick={this.props.onDeleted}>
+            <button type="button" className="btn btn-outline-danger btn-sm float-right" onClick={onDeleted}>
                 <i className="fa fa-trash-o"/>
             </button>
         </span>
-        )
-    }
+    )
 }
 
 // types
 type TodoListItemPropsType = {
     label: string
-    important: boolean
-    onDeleted: () => void
-}
-type TodoListItemStateType = {
     done: boolean
     important: boolean
+    onDeleted: () => void
+    onToggleDone: () => void
+    onToggleImportant: () => void
 }

@@ -3,18 +3,15 @@ import {TodoListItem} from "./TodoListItem/TodoListItem";
 import "./TodoList.css";
 import {TodosType, TodoType} from "../App/App";
 
-export const TodoList: FC<TodoListPropsType> = ({todos, onDeleted}) => {
+export const TodoList: FC<TodoListPropsType> = ({todos, onDeleted, onToggleDone, onToggleImportant}) => {
 
     const elements = todos.map((todo: TodoType) => {
         const {id, ...todoProps} = todo
 
-        const onDeletedHandler = () => {
-            onDeleted(id)
-        }
-
         return (
             <li key={id} className="list-group-item">
-                <TodoListItem {...todoProps} onDeleted={onDeletedHandler}/>
+                <TodoListItem {...todoProps} onDeleted={() => onDeleted(id)} onToggleDone={() => onToggleDone(id)}
+                              onToggleImportant={() => onToggleImportant(id)}/>
             </li>
         )
     })
@@ -28,4 +25,6 @@ export const TodoList: FC<TodoListPropsType> = ({todos, onDeleted}) => {
 type TodoListPropsType = {
     todos: TodosType
     onDeleted: (id: number) => void
+    onToggleDone: (id: number) => void
+    onToggleImportant: (id: number) => void
 }
