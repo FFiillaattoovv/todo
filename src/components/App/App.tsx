@@ -16,7 +16,8 @@ export class App extends Component<{}, AppStateType> {
             this.createTodoItem('Listen to the podcast'),
             this.createTodoItem('Take a walk'),
         ],
-        term: ''
+        term: '',
+        filter: 'all' as const
     }
 
     createTodoItem(label: string) {
@@ -90,22 +91,37 @@ export class App extends Component<{}, AppStateType> {
         })
     }
 
+    filter(todos: TodosType, filter: FilterType) {
+        switch (filter) {
+            case "active":
+                return todos.filter(todo => !todo.done)
+            case "done":
+                return todos.filter(todo => todo.done)
+            default:
+                return todos
+        }
+    }
+
     onSearchChange = (term: string) => {
         this.setState({term})
     }
 
+    onFilterChange = (filter: FilterType) => {
+        this.setState({filter})
+    }
+
     render() {
-        const {todos, term} = this.state
+        const {todos, term, filter} = this.state
         const doneCount = todos.filter(todo => todo.done).length
         const todoCount = todos.length - doneCount
-        const visibleTodos = this.search(todos, term)
+        const visibleTodos = this.filter(this.search(todos, term), filter)
 
         return (
             <div className="todo-app">
                 <AppHeader toDo={todoCount} done={doneCount}/>
                 <div className="top-panel d-flex">
                     <SearchPanel onSearchChange={this.onSearchChange}/>
-                    <ItemStatusFilter/>
+                    <ItemStatusFilter filter={filter} onFilterChange={this.onFilterChange}/>
                 </div>
                 <TodoList todos={visibleTodos} onDeleted={this.deleteItem} onToggleDone={this.onToggleDone}
                           onToggleImportant={this.onToggleImportant}/>
@@ -117,10 +133,6 @@ export class App extends Component<{}, AppStateType> {
 
 
 // types
-type AppStateType = {
-    todos: TodosType,
-    term: string
-}
 export type TodoType = {
     id: number
     label: string
@@ -128,5 +140,12 @@ export type TodoType = {
     important: boolean
 }
 export type TodosType = Array<TodoType>
+export type FilterType = 'all' | 'active' | 'done'
+type AppStateType = {
+    todos: TodosType,
+    term: string,
+    filter: FilterType
+}
+
 
 

@@ -1,15 +1,40 @@
 import {Component} from "react";
+import {FilterType} from "../App/App";
 
-export class ItemStatusFilter extends Component {
+export class ItemStatusFilter extends Component<ItemStatusFilterPropsType> {
+
+    buttons: ButtonsType = [
+        {name: 'all', label: 'All'},
+        {name: 'active', label: 'Active'},
+        {name: 'done', label: 'Done'},
+    ]
+
     render() {
+
+        const buttons = this.buttons.map(({name, label}) => {
+            const isActive = this.props.filter === name
+            const classNames = isActive ? 'btn-info' : 'btn-outline-secondary'
+
+            return (
+                <button type="button"
+                        key={name}
+                        className={`btn ${classNames}`}
+                        onClick={() => this.props.onFilterChange(name)}>{label}
+                </button>
+            )
+        })
+
         return (
             <div className="btn-group">
-                <button type="button" className="btn btn-info">All</button>
-                <button type="button" className="btn btn-outline-secondary">Active</button>
-                <button type="button" className="btn btn-outline-secondary">Done</button>
+                {buttons}
             </div>
         )
     }
 }
 
 // types
+type ItemStatusFilterPropsType = {
+    filter: FilterType
+    onFilterChange: (filter: FilterType) => void
+}
+type ButtonsType = Array<{ name: FilterType, label: string }>
