@@ -41,8 +41,7 @@ export class App extends Component<{}, AppStateType> {
         })
     }
 
-    addItem = () => {
-        const text = 'Learn something'
+    addItem = (text: string) => {
         const newItem = this.createTodoItem(text)
 
         this.setState(({todos}) => {
