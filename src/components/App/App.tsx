@@ -15,7 +15,8 @@ export class App extends Component<{}, AppStateType> {
             this.createTodoItem('Learn Redux'),
             this.createTodoItem('Listen to the podcast'),
             this.createTodoItem('Take a walk'),
-        ]
+        ],
+        term: ''
     }
 
     createTodoItem(label: string) {
@@ -81,19 +82,32 @@ export class App extends Component<{}, AppStateType> {
         this.setState(({todos}) => this.toggleProperty(todos, id, "done"))
     }
 
+    search(todos: TodosType, term: string) {
+        if (term === '') return todos
+
+        return todos.filter(todo => {
+            return todo.label.toLowerCase().indexOf(term.toLowerCase()) > -1
+        })
+    }
+
+    onSearchChange = (term: string) => {
+        this.setState({term})
+    }
+
     render() {
-        const {todos} = this.state
+        const {todos, term} = this.state
         const doneCount = todos.filter(todo => todo.done).length
         const todoCount = todos.length - doneCount
+        const visibleTodos = this.search(todos, term)
 
         return (
             <div className="todo-app">
                 <AppHeader toDo={todoCount} done={doneCount}/>
                 <div className="top-panel d-flex">
-                    <SearchPanel/>
+                    <SearchPanel onSearchChange={this.onSearchChange}/>
                     <ItemStatusFilter/>
                 </div>
-                <TodoList todos={todos} onDeleted={this.deleteItem} onToggleDone={this.onToggleDone}
+                <TodoList todos={visibleTodos} onDeleted={this.deleteItem} onToggleDone={this.onToggleDone}
                           onToggleImportant={this.onToggleImportant}/>
                 <ItemAddForm onItemAdded={this.addItem}/>
             </div>
@@ -104,7 +118,8 @@ export class App extends Component<{}, AppStateType> {
 
 // types
 type AppStateType = {
-    todos: TodosType
+    todos: TodosType,
+    term: string
 }
 export type TodoType = {
     id: number
